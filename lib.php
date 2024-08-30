@@ -21,6 +21,19 @@ define("FREQUENCY", [
     MONTHLY => get_string('monthly', 'local_scheduled_reports')
 ]);
 
+function get_custom_reports() {
+    global $DB, $USER;
+
+    $params = [];
+
+    // Only admins can see all the reports.
+    if (!is_siteadmin()) {
+        $params['userid'] = $USER->id;
+    }
+
+    return $DB->get_records_menu('block_configurable_reports', $params, '', 'id, name');
+}
+
 /**
  * Retrieves a list of scheduled reports.
  *
@@ -31,15 +44,33 @@ define("FREQUENCY", [
  * @return array An array of scheduled reports, each containing the report ID, name, frequency, and next report date.
  */
 function get_scheduled_reports() {
-    global $DB;
+    global $DB, $USER;
 
-    $sql = "SELECT sr.id, cr.name, sr.frequency, sr.nextreport
+    $sql = "SELECT sr.id, cr.name, sr.userid, sr.frequency, sr.nextreport, sr.enabled
               FROM {local_scheduled_reports} sr
          LEFT JOIN {block_configurable_reports} cr ON sr.reportid = cr.id";
-    $reports = $DB->get_records_sql($sql);
+    $params = [];
+
+    // Only admins can see all the scheduled reports.
+    if (!is_siteadmin()) {
+        $sql .= " WHERE sr.userid = :userid";
+        $params['userid'] = $USER->id;
+    }
+
+    $reports = $DB->get_records_sql($sql, $params);
 
     foreach ($reports as $report) {
-        $report->nextreport = userdate($report->nextreport);
+        // Get the user's full name.
+        if ($report->userid != $USER->id) {
+            $user = $DB->get_record('user', ['id' => $report->userid]);
+        } else {
+            $user = $USER;
+        }
+        $report->username = fullname($user);
+
+        // Format the next report date.
+
+        $report->nextreport = userdate($report->nextreport, get_string('strftimedate'));
         $report->frequency = FREQUENCY[$report->frequency];
     }
 

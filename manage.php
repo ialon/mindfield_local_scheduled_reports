@@ -20,20 +20,23 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('managescheduledreports', 'local_scheduled_reports'));
 
 // Add scheduled report button
-$addreporturl = $CFG->wwwroot . '/local/scheduled_reports/edit.php';
-$addreporthtml = html_writer::div(
-    html_writer::link($addreporturl, get_string('addreport', 'local_scheduled_reports'), ['class' => 'btn btn-secondary']),
-    'addbutton text-right'
-);
-echo $OUTPUT->heading($addreporthtml);
+if (!empty(get_custom_reports())) {
+    $addreporturl = $CFG->wwwroot . '/local/scheduled_reports/edit.php';
+    $addreporthtml = html_writer::div(
+        html_writer::link($addreporturl, get_string('addreport', 'local_scheduled_reports'), ['class' => 'btn btn-secondary']),
+        'addbutton text-right'
+    );
+    echo $OUTPUT->heading($addreporthtml);
+}
 
 /// Print the table of all scheduled reports
 $reports = get_scheduled_reports();
 
 $table = new flexible_table('local_scheduled_reports_administration_table');
-$table->define_columns(array('name', 'frequency', 'nextreport', 'actions'));
+$table->define_columns(array('name', 'owner', 'frequency', 'nextreport', 'actions'));
 $table->define_headers(array(
     get_string('name', 'local_scheduled_reports'),
+    get_string('owner', 'local_scheduled_reports'),
     get_string('frequency', 'local_scheduled_reports'),
     get_string('nextreport', 'local_scheduled_reports'),
     get_string('actions', 'local_scheduled_reports')
@@ -45,8 +48,8 @@ $table->setup();
 
 $stredit = get_string('edit');
 $strdelete = get_string('delete');
-$strhide = get_string('hide');
-$strshow = get_string('show');
+$strdisable = get_string('disable', 'local_scheduled_reports');
+$strenable = get_string('enable', 'local_scheduled_reports');
 
 foreach ($reports as $report) {
     $actions = '';
@@ -58,6 +61,21 @@ foreach ($reports as $report) {
         ['title' => $stredit]
     );
 
+    // Enable/Disable link
+    if ($report->enabled) {
+        $actions .= html_writer::link(
+            new moodle_url('/local/scheduled_reports/edit.php', ['id' => $report->id, 'disable' => 1, 'sesskey' => sesskey()]),
+            $OUTPUT->pix_icon('t/hide', $strdisable),
+            ['title' => $strdisable]
+        );
+    } else {
+        $actions .= html_writer::link(
+            new moodle_url('/local/scheduled_reports/edit.php', ['id' => $report->id, 'enable' => 1, 'sesskey' => sesskey()]),
+            $OUTPUT->pix_icon('t/show', $strenable),
+            ['title' => $strenable]
+        );
+    }
+
     // Delete link
     $actions .= html_writer::link(
         new moodle_url('/local/scheduled_reports/edit.php', ['id' => $report->id, 'delete' => 1, 'sesskey' => sesskey()]),
@@ -65,22 +83,7 @@ foreach ($reports as $report) {
         ['title' => $strdelete]
     );
 
-    // Enable/Disable link
-    if (!empty($report->enabled)) {
-        $actions .= html_writer::link(
-            new moodle_url('/local/scheduled_reports/edit.php', ['id' => $report->id, 'hide' => 1, 'sesskey' => sesskey()]),
-            $OUTPUT->pix_icon('t/hide', $strhide),
-            ['title' => $strhide]
-        );
-    } else {
-        $actions .= html_writer::link(
-            new moodle_url('/local/scheduled_reports/edit.php', ['id' => $report->id, 'show' => 1, 'sesskey' => sesskey()]),
-            $OUTPUT->pix_icon('t/show', $strshow),
-            ['title' => $strshow]
-        );
-    }
-
-    $table->add_data(array($report->name, $report->frequency, $report->nextreport, $actions));
+    $table->add_data(array($report->name, $report->username, $report->frequency, $report->nextreport, $actions));
 }
 
 $table->print_html();
