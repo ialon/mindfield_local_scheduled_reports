@@ -50,6 +50,7 @@ $stredit = get_string('edit');
 $strdelete = get_string('delete');
 $strdisable = get_string('disable', 'local_scheduled_reports');
 $strenable = get_string('enable', 'local_scheduled_reports');
+$strsend = get_string('sendnow', 'local_scheduled_reports');
 
 foreach ($reports as $report) {
     $actions = '';
@@ -81,6 +82,13 @@ foreach ($reports as $report) {
             ['title' => $strenable]
         );
     }
+
+    // Send now link
+    $actions .= html_writer::link(
+        new moodle_url('/local/scheduled_reports/edit.php', ['id' => $report->id, 'send' => 1, 'sesskey' => sesskey()]),
+        $OUTPUT->pix_icon('t/email', $strsend),
+        ['title' => $strsend]
+    );
 
     // Delete link
     $actions .= html_writer::link(

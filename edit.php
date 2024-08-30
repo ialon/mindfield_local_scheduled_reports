@@ -17,6 +17,7 @@ $delete = optional_param('delete', 0, PARAM_BOOL);
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
 $enable = optional_param('enable', 0, PARAM_BOOL);
 $disable = optional_param('disable', 0, PARAM_BOOL);
+$send = optional_param('send', 0, PARAM_BOOL);
 
 require_login();
 $context = context_system::instance();
@@ -75,6 +76,32 @@ if ($delete && confirm_sesskey()) {
     }
 
     $DB->delete_records('local_scheduled_reports', ['id' => $schedule->id]);
+    header("Location: $CFG->wwwroot/local/scheduled_reports/manage.php");
+    die;
+}
+
+if ($send && confirm_sesskey()) {
+    if (!$confirm) {
+        $PAGE->set_title($title);
+        $PAGE->set_heading($title);
+        echo $OUTPUT->header();
+        $message = get_string('confirmsendnow', 'local_scheduled_reports');
+        $optionsyes = ['id' => $schedule->id, 'send' => $send, 'sesskey' => sesskey(), 'confirm' => 1];
+        $optionsno = [];
+        $buttoncontinue = new single_button(new moodle_url('edit.php', $optionsyes), get_string('yes'), 'get');
+        $buttoncancel = new single_button(new moodle_url('manage.php', $optionsno), get_string('no'), 'get');
+        echo $OUTPUT->confirm($message, $buttoncontinue, $buttoncancel);
+        echo $OUTPUT->footer();
+        exit;
+    }
+
+    send_report($schedule);
+
+    \core\notification::add(
+        get_string('reportssent', 'local_scheduled_reports'),
+        \core\notification::SUCCESS
+    );
+
     header("Location: $CFG->wwwroot/local/scheduled_reports/manage.php");
     die;
 }
