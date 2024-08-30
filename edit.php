@@ -85,11 +85,17 @@ if (!$availablereports = get_custom_reports()) {
     redirect($CFG->wwwroot . '/local/scheduled_reports/manage.php');
 }
 
+$exportplugins = get_list_of_plugins('blocks/configurable_reports/export');
+$availableformats = [];
+foreach ($exportplugins as $plugin) {
+    $availableformats[$plugin] = get_string('export_' . $plugin, 'block_configurable_reports');
+}
+
 if (!empty($schedule)) {
     $schedule->nextreportdate = userdate($schedule->nextreport, get_string('strftimedate'));
-    $editform = new edit_form('edit.php', compact('availablereports', 'schedule'));
+    $editform = new edit_form('edit.php', compact('availablereports', 'availableformats', 'schedule'));
 } else {
-    $editform = new edit_form('edit.php', compact('availablereports'));
+    $editform = new edit_form('edit.php', compact('availablereports', 'availableformats'));
 }
 
 if (!empty($schedule)) {

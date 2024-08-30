@@ -53,6 +53,15 @@ class edit_form extends moodleform {
         );
         $mform->setDefault('frequency', MONTHLY);
 
+        // Preferred format
+        $mform->addElement(
+            'select',
+            'format',
+            get_string('format', 'local_scheduled_reports'),
+            $this->_customdata['availableformats']
+        );
+        $mform->addHelpButton('format', 'format', 'local_scheduled_reports');
+
         // Internal users
         $mform->addElement('textarea', 'internal_users', get_string('internalusers', 'local_scheduled_reports'), 'cols="40" rows="4"');
         $mform->setType('internal_users', PARAM_RAW);
