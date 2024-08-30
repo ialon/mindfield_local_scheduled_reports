@@ -54,6 +54,12 @@ $strenable = get_string('enable', 'local_scheduled_reports');
 foreach ($reports as $report) {
     $actions = '';
 
+    // Report name with link
+    $reportname = html_writer::link(
+        new moodle_url('/blocks/configurable_reports/managereport.php', ['courseid' => $report->courseid]),
+        $report->name
+    );
+
     // Edit link
     $actions .= html_writer::link(
         new moodle_url('/local/scheduled_reports/edit.php', ['id' => $report->id]),
@@ -83,7 +89,7 @@ foreach ($reports as $report) {
         ['title' => $strdelete]
     );
 
-    $table->add_data(array($report->name, $report->username, $report->frequency, $report->nextreport, $actions));
+    $table->add_data(array($reportname, $report->username, $report->frequency, $report->nextreport, $actions));
 }
 
 $table->print_html();

@@ -8,6 +8,7 @@
  */
 
 $string['pluginname'] = "Scheduled Reports";
+$string['emailreports'] = "Send scheduled custom reports";
 $string['managescheduledreports'] = "Manage scheduled reports";
 
 $string['name'] = "Report";
@@ -38,3 +39,7 @@ $string['errorsavingschedule'] = "Error saving schedule";
 $string['invalidusername'] = "The list contains an invalid username";
 $string['invalidemail'] = "The list of emails contains an invalid address";
 $string['requiredusers'] = "You must specify either internal or external users";
+$string['errorfetchingfile'] = "Error fetching file";
+$string['errorsavingfile'] = "Error saving file";
+
+$string['messagebody'] = '<p>Here is the scheduled report you requested: {$a}</p>';

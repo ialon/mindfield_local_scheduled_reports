@@ -99,18 +99,7 @@ if (!empty($schedule)) {
 if ($editform->is_cancelled()) {
     redirect($CFG->wwwroot . '/local/scheduled_reports/manage.php');
 } else if ($data = $editform->get_data()) {
-    $seconds = 0;
-    switch ($data->frequency) {
-        case DAILY:
-            $seconds = 86400;
-            break;
-        case WEEKLY:
-            $seconds = 604800;
-            break;
-        case MONTHLY:
-            $seconds = 2592000;
-            break;
-    }
+    $seconds = frequency_to_seconds($data->frequency);
 
     if (empty($data->enabled)) {
         $data->enabled = 0;
