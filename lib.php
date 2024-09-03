@@ -10,38 +10,96 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// Day
 define("DAILY", 1);
-define("WEEKLY", 2);
-define("MONTHLY", 3);
+
+// Week
+define("WEEKLY", 10);
+define("MONDAY", 11);
+define("TUESDAY", 12);
+define("WEDNESDAY", 13);
+define("THURSDAY", 14);
+define("FRIDAY", 15);
+define("SATURDAY", 16);
+define("SUNDAY", 17);
+define("BIWEEKLY", 19);
+
+// Month
+define("MONTHLY", 100);
+define("START_MONTH", 198);
+define("END_MONTH", 199);
 
 // Define constants
 define("FREQUENCY", [
     DAILY => get_string('daily', 'local_scheduled_reports'),
     WEEKLY => get_string('weekly', 'local_scheduled_reports'),
-    MONTHLY => get_string('monthly', 'local_scheduled_reports')
+    MONDAY => get_string('every_monday', 'local_scheduled_reports'),
+    TUESDAY => get_string('every_tuesday', 'local_scheduled_reports'),
+    WEDNESDAY => get_string('every_wednesday', 'local_scheduled_reports'),
+    THURSDAY => get_string('every_thursday', 'local_scheduled_reports'),
+    FRIDAY => get_string('every_friday', 'local_scheduled_reports'),
+    SATURDAY => get_string('every_saturday', 'local_scheduled_reports'),
+    SUNDAY => get_string('every_sunday', 'local_scheduled_reports'),
+    BIWEEKLY => get_string('biweekly', 'local_scheduled_reports'),
+    MONTHLY => get_string('monthly', 'local_scheduled_reports'),
+    START_MONTH => get_string('start_month', 'local_scheduled_reports'),
+    END_MONTH => get_string('end_month', 'local_scheduled_reports')
 ]);
 
 /**
- * Converts a frequency value to seconds.
+ * Calculates the next report date based on the given frequency.
  *
- * @param int $frequency The frequency value to convert.
- * @return int The equivalent number of seconds.
+ * @param int $frequency The frequency of the report.
+ * @return int The timestamp of the next report date.
  */
-function frequency_to_seconds($frequency) {
-    $seconds = 0;
+function calculate_next_report($frequency) {
     switch ($frequency) {
         case DAILY:
-            $seconds = 86400;
+            $strtotime = 'tomorrow';
             break;
         case WEEKLY:
-            $seconds = 604800;
+            $strtotime = '+1 week';
+            break;
+        case BIWEEKLY:
+            $strtotime = '+2 weeks';
+            break;
+        case MONDAY:
+            $strtotime = 'next monday';
+            break;
+        case TUESDAY:
+            $strtotime = 'next tuesday';
+            break;
+        case WEDNESDAY:
+            $strtotime = 'next wednesday';
+            break;
+        case THURSDAY:
+            $strtotime = 'next thursday';
+            break;
+        case FRIDAY:
+            $strtotime = 'next friday';
+            break;
+        case SATURDAY:
+            $strtotime = 'next saturday';
+            break;
+        case SUNDAY:
+            $strtotime = 'next sunday';
             break;
         case MONTHLY:
-            $seconds = 2592000;
+            $strtotime = '+1 month';
+            break;
+        case START_MONTH:
+            $strtotime = 'first day of next month';
+            break;
+        case END_MONTH:
+            $strtotime = 'last day of';
+            // Special case: if today is the last day of the month, set the next report to the last day of next month
+            if (date('d', strtotime('last day of this month')) == date('d')) {
+                $strtotime .= ' next month';
+            }
             break;
     }
 
-    return $seconds;
+    return strtotime($strtotime, strtotime('today'));
 }
 
 /**
@@ -288,7 +346,6 @@ function send_report($schedule) {
     unlink($attachment);
 
     // Update the next report date
-    $seconds = frequency_to_seconds($schedule->frequency);
-    $schedule->nextreport = time() + $seconds;
+    $schedule->nextreport = calculate_next_report($schedule->frequency);
     $DB->update_record('local_scheduled_reports', $schedule);
 }

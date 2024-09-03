@@ -132,8 +132,6 @@ if (!empty($schedule)) {
 if ($editform->is_cancelled()) {
     redirect($CFG->wwwroot . '/local/scheduled_reports/manage.php');
 } else if ($data = $editform->get_data()) {
-    $seconds = frequency_to_seconds($data->frequency);
-
     if (empty($data->enabled)) {
         $data->enabled = 0;
     }
@@ -156,14 +154,14 @@ if ($editform->is_cancelled()) {
 
     if (empty($schedule)) {
         $data->userid = $USER->id;
-        $data->nextreport = time() + $seconds;
+        $data->nextreport = calculate_next_report($data->frequency);
 
         if (!$lastid = $DB->insert_record('local_scheduled_reports', $data)) {
             throw new moodle_exception('errorsavingschedule', 'local_scheduled_reports');
         }
     } else {
         if ($data->reschedule || $schedule->frequency != $data->frequency) {
-            $data->nextreport = time() + $seconds;
+            $data->nextreport = calculate_next_report($data->frequency);
         }
 
         if (!$DB->update_record('local_scheduled_reports', $data)) {

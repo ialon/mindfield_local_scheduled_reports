@@ -32,7 +32,17 @@ $string['externalusers'] = "External users";
 $string['externalusers_help'] = "A list of emails to send the report to separated by either commas or new lines";
 $string['daily'] = "Daily";
 $string['weekly'] = "Weekly";
+$string['every_monday'] = "Every Monday";
+$string['every_tuesday'] = "Every Tuesday";
+$string['every_wednesday'] = "Every Wednesday";
+$string['every_thursday'] = "Every Thursday";
+$string['every_friday'] = "Every Friday";
+$string['every_saturday'] = "Every Saturday";
+$string['every_sunday'] = "Every Sunday";
+$string['biweekly'] = "Biweekly";
 $string['monthly'] = "Monthly";
+$string['start_month'] = "Start of the month";
+$string['end_month'] = "End of the month";
 
 $string['scheduledoesnotexist'] = "No such schedule with this ID";
 $string['newschedule'] = "New scheduled report";
