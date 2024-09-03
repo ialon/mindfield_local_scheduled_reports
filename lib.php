@@ -157,7 +157,7 @@ function get_scheduled_reports() {
 
         // Format the next report date.
 
-        $report->nextreport = userdate($report->nextreport, get_string('strftimedate'));
+        $report->nextreport = userdate($report->nextreport, get_string('strftimedaydate'));
         $report->frequency = FREQUENCY[$report->frequency];
     }
 

@@ -119,7 +119,7 @@ foreach ($exportplugins as $plugin) {
 }
 
 if (!empty($schedule)) {
-    $schedule->nextreportdate = userdate($schedule->nextreport, get_string('strftimedate'));
+    $schedule->nextreportdate = userdate($schedule->nextreport, get_string('strftimedaydate'));
     $editform = new edit_form('edit.php', compact('availablereports', 'availableformats', 'schedule'));
 } else {
     $editform = new edit_form('edit.php', compact('availablereports', 'availableformats'));
